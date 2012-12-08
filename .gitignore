@@ -7,4 +7,3 @@ covreport/
 zcov/
 bin/
 *.tar.*
-*.mat

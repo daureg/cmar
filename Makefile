@@ -9,7 +9,7 @@ BIN_DIR=bin
 BIN_ARGS=filleddata_VBPCA_labels.mat
 
 DEFINES=$(INCLUDES) $(DEFS)
-DEBUG=0
+DEBUG=1
 WARNINGS=-Wall -Wextra -pedantic
 COMMON=-std=c99 $(DEFINES) $(WARNINGS) $(shell pkg-config --cflags matio)
 DEBUG_FLAG=-O0 -ggdb3 -fprofile-arcs -ftest-coverage -D__DEBUG_
