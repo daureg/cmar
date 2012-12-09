@@ -6,7 +6,7 @@ INCLUDES=
 LIBS=$(shell pkg-config --libs matio)
 ZCOV_DIR=zcov
 BIN_DIR=bin
-BIN_ARGS=filleddata_VBPCA_labels.mat
+BIN_ARGS=test.mat
 
 DEFINES=$(INCLUDES) $(DEFS)
 DEBUG=1
@@ -28,9 +28,11 @@ x: all
 
 main: main.o cmar.o
 	mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/main main.c cmar.o $(LIBS)
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/main main.c cmar.o memsys.o $(LIBS)
 
-cmar.o: cmar.c
+memsys.o: memsys.c
+	$(CC) $(CFLAGS) -c memsys.c $(LIBS)
+cmar.o: cmar.c memsys.o
 	$(CC) $(CFLAGS) -c cmar.c $(LIBS)
 
 # Need check framework: http://check.sourceforge.net/
@@ -39,7 +41,7 @@ check_cmar.o: check_cmar.c
 
 check_cmar: check_cmar.o cmar.o
 	mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/check_cmar check_cmar.o cmar.o $(LIBS) $(shell pkg-config --libs check)
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/check_cmar check_cmar.o cmar.o memsys.o $(LIBS) $(shell pkg-config --libs check)
 
 check: check_cmar
 	$(BIN_DIR)/check_cmar
