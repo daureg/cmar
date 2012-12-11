@@ -59,7 +59,7 @@ bool read_matrix(const char* name, mat* db, mat* labels, mat* features) {
 fptree* init_tree(mat* features, int min_supp) {
 	fptree* tree = malloc(sizeof(fptree));
 	tree->nodes = 0;
-	tree->pool = ms_create(sizeof(fpnode), 1<<16);
+	tree->pool = ms_create(sizeof(fpnode), 1<<17);
 	tree->root.feature = -1;
 	tree->root.support[0] = 0;
 	tree->root.support[1] = 0;
@@ -75,7 +75,9 @@ fptree* init_tree(mat* features, int min_supp) {
 	}
 	printf("max:%d\n",largest_feature);
 	tree->heads = (fphead*)malloc((largest_feature+1)*sizeof(fphead));
+	tree->nb_heads = largest_feature+1;
 	for (int i = 0; i < nb_features; i++) {
+		tree->heads[i].feature = -1;
 		feature = feats[nb_features+i];
 		total_support = feats[i];
 		if (total_support >= min_supp) {
@@ -83,8 +85,7 @@ fptree* init_tree(mat* features, int min_supp) {
 			tree->heads[feature].support[0] = feats[2*nb_features+i];
 			tree->heads[feature].support[1] = total_support - tree->heads[feature].support[0];
 			tree->heads[feature].list = NULL;
-			printf("%d: %d+%d=%d\n", feature, tree->heads[feature].support[0],
-					tree->heads[feature].support[1], total_support);
+			//printf("%d: %d+%d=%d\n", feature, tree->heads[feature].support[0], tree->heads[feature].support[1], total_support);
 		}
 	}
 	return tree;
@@ -122,7 +123,7 @@ fpnode* find_elsewhere(fpnode* start, fpnode* from) {
 	return start;
 }
 void insert_item(fptree* tree, int* transac, int class, int trsize) {
-	printf("insert (%d, %d)\n",class, trsize);
+	//printf("insert (%d, %d)\n",class, trsize);
 	int f = 0;
 	bool can_go_deeper = true;
 	fpnode* node = &(tree->root);
@@ -139,12 +140,12 @@ void insert_item(fptree* tree, int* transac, int class, int trsize) {
 		down = find_elsewhere(down, node);
 		can_go_deeper = down != NULL && down->parent == node;
 		if (can_go_deeper) {
-			printf("go deeper…\n");
+			//printf("go deeper…\n");
 			node = down;
 			f++;
 		}
 	}
-	printf("reach level %d, time to insert\n", f);
+	//printf("reach level %d, time to insert\n", f);
 	for (; f < trsize; f++) {
 		child =ms_alloc(tree->pool);
 		tree->nodes++;
@@ -154,7 +155,7 @@ void insert_item(fptree* tree, int* transac, int class, int trsize) {
 		child->support[class]++;
 		child->next = tree->heads[transac[f]].list;
 		tree->heads[transac[f]].list = child;
-		printf("create %d --> %d\n", node->feature, child->feature);
+		//printf("create %d --> %d\n", node->feature, child->feature);
 		node = child;
 	}
 }
@@ -165,12 +166,13 @@ void fpt_show (fptree *fpt, int ind)
   int    i, k;                  /* loop variable */
   fpnode *node;                 /* to traverse the node lists */
 
-  printf("\n"); indent(ind); printf("------\n");
+  printf("\n"); indent(ind); printf("------nb nodes:%d\n",fpt->nodes);
   indent(ind);                  /* indent the output line */
   printf("* (%d,%d)\n", fpt->root.support[0], fpt->root.support[1]);
   int heads[] = {20, 31, 10, 4, 3, 11};
-  for (int j = 0; j < 6; j++) {  /* traverse the items */
-	  i=heads[j];
+  for (int i = 1; i < fpt->nb_heads; i++) {  /* traverse the items */
+	  if (fpt->heads[i].feature <1)
+		  continue;
     indent(ind);                /* indent the output line */
     k = fpt->heads[i].feature;     /* print item and support */
     if (k < 0) printf("%04x", k & 0xffff);

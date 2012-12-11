@@ -7,7 +7,7 @@
 #include <string.h>
 #include <matio.h>
 #include "memsys.h"
-static const unsigned short int MAX_UNIQUE_FEATURES_VALUES = 10;
+static const unsigned short int MAX_UNIQUE_FEATURES_VALUES = 430;
 typedef struct _mat {
 	int rows;
 	int cols;
@@ -29,6 +29,7 @@ typedef struct _fptree {
 	MEMSYS* pool;
 	fpnode root;
 	fphead* heads;
+	int nb_heads;
 } fptree;
 bool read_matrix(const char* name, mat* db, mat* labels, mat* features);
 fptree* init_tree(mat* features, int min_supp);

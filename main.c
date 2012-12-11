@@ -20,20 +20,26 @@ int main(int argc,char** argv) {
 		printf("\n");
 	}
 
-	fptree* t = init_tree(features, 2);
-	printf("%d\n", t->heads[31].support[1]);
+	fptree* t = init_tree(features, 20);
+	printf("%d\n", t->heads[1291].support[1]);
+	
 	int* trans = malloc(db->cols*sizeof(int));
+	if (trans==NULL) {
+		return false;
+	}
 	size_t trsize;
-	for (int i = 0; i < db->rows; i++) {
-		trsize = rewrite_transaction(db, features, 2, i, trans);
-		insert_item(t, trans, ((char*)labels->data)[i], trsize);
+	for (int i = 0; i <db->rows; i++) {
+		trsize = rewrite_transaction(db, features, 20, i, trans);
+		insert_item(t, trans, ((int_fast8_t*)labels->data)[i], trsize);
+#if 0
 		for (int j = 0; j < db->cols; j++) {
-			printf("%d\t",trans[j]);
+			printf("%d ",trans[j]);
 		}
 		printf("\n");
+#endif
 	}
 	free(trans);
-	fpt_show(t, 1);
+	//fpt_show(t, 0);
 	free_tree(t);
 	free(db->data); free(db);
 	free(features->data); free(features);

@@ -6,10 +6,10 @@ INCLUDES=
 LIBS=$(shell pkg-config --libs matio)
 ZCOV_DIR=zcov
 BIN_DIR=bin
-BIN_ARGS=test.mat
+BIN_ARGS=data_id.mat
 
 DEFINES=$(INCLUDES) $(DEFS)
-DEBUG=1
+DEBUG=0
 WARNINGS=-Wall -Wextra -pedantic
 COMMON=-std=c99 $(DEFINES) $(WARNINGS) $(shell pkg-config --cflags matio)
 DEBUG_FLAG=-O0 -ggdb3 -fprofile-arcs -ftest-coverage -D__DEBUG_
